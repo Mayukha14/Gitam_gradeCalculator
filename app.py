@@ -173,7 +173,7 @@ if mode == "📊 CGPA Calculator":
             )
 
         if st.button("Calculate CGPA"):
-    result = calculate_cgpa(st.session_state.courses)
+            result = calculate_cgpa(st.session_state.courses)
 
     cgpa, incomplete = result
 
