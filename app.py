@@ -94,7 +94,7 @@ def calculate_cgpa(courses):
 # ======================
 
 st.title("🎓 GITAM Grade & CGPA Calculator")
-st.caption("No departments. No semesters. Just grades and math.")
+st.caption("Built by a student. For students.")
 
 mode = st.radio(
     "Choose what you want to calculate:",
@@ -110,7 +110,10 @@ if mode == "📘 Course Grade Predictor":
     st.header("📘 Course Grade Predictor")
 
     s1 = st.number_input("Sessional 1 Marks (out of 30)", 0.0, 30.0)
-    le = st.selectbox("Learning Engagement Grade", list(GRADE_POINT_MAP.keys()))
+    le = st.selectbox(
+    "Learning Engagement Grade",
+    ["O", "A+", "A", "B+", "B", "C", "L"]
+)
     if le == "L":
         st.warning("⚠️ Learning Engagement = L severely impacts final grade.")
 
@@ -184,10 +187,10 @@ if mode == "📊 CGPA Calculator":
                 f"📌 {len(incomplete)} course(s) incomplete: "
                 + ", ".join(incomplete)
             )
-            st.info("You’re almost there — finish strong 💪")
+            st.info("Final stretch. Lock in!")
         else:
             st.balloons()
-            st.success("🔥 All courses completed. Proud of you.")
+            st.success("🎉 All courses completed. Well done!")
 
         if st.button("Clear all courses"):
             st.session_state.courses = []
