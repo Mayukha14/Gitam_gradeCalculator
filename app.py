@@ -174,8 +174,7 @@ if mode == "📊 CGPA Calculator":
 
         if st.button("Calculate CGPA"):
             result = calculate_cgpa(st.session_state.courses)
-
-    cgpa, incomplete = result
+            cgpa, incomplete = result
 
     if cgpa is None:
         st.error("❌ No completed courses yet.")
