@@ -173,23 +173,19 @@ if mode == "📊 CGPA Calculator":
             )
 
         if st.button("Calculate CGPA"):
-            result = calculate_cgpa(st.session_state.courses)
-            cgpa, incomplete = result
-
-    if cgpa is None:
-        st.error("❌ No completed courses yet.")
-    else:
-        st.success(f"🎯 Current CGPA: **{cgpa}**")
-
-        if incomplete:
-            st.warning(
-                f"📌 {len(incomplete)} course(s) incomplete: "
-                + ", ".join(incomplete)
-            )
-            st.info("Final stretch. Lock in!")
-        else:
-            st.balloons()
-            st.success("🎉 All courses completed. Well done!")
+            cgpa, incomplete = calculate_cgpa(st.session_state.courses)
+            
+            if cgpa is None:
+                st.error("❌ No completed courses yet.")
+            else:
+                st.success(f"🎯 Current CGPA: **{cgpa}**")
+                
+                if incomplete:
+                    st.warning(f"📌 {len(incomplete)} course(s) incomplete: "+ ", ".join(incomplete))
+                    st.info("Final stretch. Lock in!")
+                else:
+                    st.balloons()
+                    st.success("🎉 All courses completed. Well done!")
 
         if st.button("Clear all courses"):
             st.session_state.courses = []
