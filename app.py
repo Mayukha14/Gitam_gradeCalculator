@@ -14,8 +14,10 @@ GRADE_POINT_MAP = {
     "B+": 7,
     "B": 6,
     "C": 5,
-    "P": 4
-}
+    "P": 4,
+    "L": 0,   # Learning engagement not met
+    "I": 0    # Incomplete
+} 
 
 # ======================
 # CORE LOGIC
@@ -69,13 +71,23 @@ def required_s2_for_target(s1, le, target):
     return round(max(0, marks), 2)
 
 def calculate_cgpa(courses):
-    total_credits = sum(c["credits"] for c in courses)
-    weighted_sum = sum(GRADE_POINT_MAP[c["grade"]] * c["credits"] for c in courses)
+    completed = [c for c in courses if c["grade"] != "I"]
 
-    if total_credits == 0:
-        return 0
+    if not completed:
+        return None, ["All courses are incomplete."]
 
-    return round(weighted_sum / total_credits, 2)
+    total_credits = sum(c["credits"] for c in completed)
+    weighted_sum = sum(
+        GRADE_POINT_MAP[c["grade"]] * c["credits"]
+        for c in completed
+    )
+
+    cgpa = round(weighted_sum / total_credits, 2)
+
+    incomplete_courses = [c["name"] for c in courses if c["grade"] == "I"]
+
+    return cgpa, incomplete_courses
+
 
 # ======================
 # UI
@@ -99,6 +111,8 @@ if mode == "📘 Course Grade Predictor":
 
     s1 = st.number_input("Sessional 1 Marks (out of 30)", 0.0, 30.0)
     le = st.selectbox("Learning Engagement Grade", list(GRADE_POINT_MAP.keys()))
+    if le == "L":
+        st.warning("⚠️ Learning Engagement = L severely impacts final grade.")
 
     st.subheader("🔮 Required Sessional 2 Marks")
 
@@ -133,8 +147,11 @@ if mode == "📊 CGPA Calculator":
 
     with st.form("add_course_form"):
         course_name = st.text_input("Course name (optional)")
-        credits = st.number_input("Credits", min_value=0.5, step=0.5)
-        grade = st.selectbox("Final Grade", list(GRADE_POINT_MAP.keys()))
+        credits = st.number_input("Credits", min_value=1, step=1)
+        grade = st.selectbox(
+    "Final Grade",
+    ["O","A+","A","B+","B","C","P","I"]
+)
         submitted = st.form_submit_button("➕ Add course")
 
         if submitted:
@@ -153,8 +170,29 @@ if mode == "📊 CGPA Calculator":
             )
 
         if st.button("Calculate CGPA"):
-            cgpa = calculate_cgpa(st.session_state.courses)
-            st.success(f"🎯 Estimated CGPA: **{cgpa}**")
+    result = calculate_cgpa(st.session_state.courses)
+
+    cgpa, incomplete = result
+
+    if cgpa is None:
+        st.error("❌ No completed courses yet.")
+    else:
+        st.success(f"🎯 Current CGPA: **{cgpa}**")
+
+        if incomplete:
+            st.warning(
+                f"📌 {len(incomplete)} course(s) incomplete: "
+                + ", ".join(incomplete)
+            )
+            st.info("You’re almost there — finish strong 💪")
+        else:
+            st.balloons()
+            st.success("🔥 All courses completed. Proud of you.")
 
         if st.button("Clear all courses"):
             st.session_state.courses = []
+
+st.caption(
+    "⚠️ This is an unofficial student-built tool for guidance only. "
+    "It is not affiliated with or endorsed by GITAM University."
+)
